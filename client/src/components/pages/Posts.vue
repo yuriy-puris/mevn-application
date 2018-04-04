@@ -18,12 +18,17 @@
             tr( v-for="(post, index) in posts", :key="post.title" )
               td {{ post.title }}
               td {{ post.description }}
+              td
+                router-link( :to="{ name: 'EditPost', params: { id: post._id } }" )
+                  | edit post
+                button.btn.btn-danger.btn-sm( type="button", @click="removePost(post._id)" )
+                  | delete
 
         section.panel.panel-danger( v-else="posts.length" )
         p
         | There are no posts ... Lets add one now!
         div
-        router-link( :to="{ name: 'NewPost' }" )
+        router-link( :to="{ name: 'NewPostPage' }" )
           | add new post
 
 </template>
@@ -40,8 +45,13 @@
     },
     methods: {
       async getPosts() {
-        const response = await PostService.fetchPosts()
+        const response = await PostsService.fetchPosts()
         this.posts = response.data.posts
+        console.log(response)
+      },
+      async removePost(value) {
+        await PostsService.deletePost(value)
+        this.getPosts()
       }
     },
     mounted() {
